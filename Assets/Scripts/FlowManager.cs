@@ -37,7 +37,15 @@ public class FlowManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(Input.GetKeyDown(KeyCode.N))
+		{
+            CallNextClip(1);
+            //Debug.Log("Entrée 1")
+		}
+        if(Input.GetKeyDown(KeyCode.P))
+		{
+            CallNextClip(-1);
+		}
     }
 
     public void CallNextClip(int _cursorMovement)
@@ -49,6 +57,7 @@ public class FlowManager : MonoBehaviour
             if(_TargetIndex == voicesToPlay[i].index)
 			{
                 _voiceToPlay = voicesToPlay[i].audioClipName;
+                CurrentVoiceClipIndex = _TargetIndex;
                 break;
 			}
 		}
