@@ -6,7 +6,7 @@ using UnityEngine;
 public struct OrderedAudioClips
 {
     public int index;
-    public string audioClipName;
+    public string audioClipName;   
 }
 
 public class FlowManager : MonoBehaviour
@@ -14,6 +14,7 @@ public class FlowManager : MonoBehaviour
     public List<OrderedAudioClips> voicesToPlay = new List<OrderedAudioClips>();
 
     int CurrentVoiceClipIndex = 0;
+    bool isVoiceStopped;
 
     static public FlowManager Instance { get; private set; }
 
@@ -37,15 +38,7 @@ public class FlowManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.N))
-		{
-            CallNextClip(1);
-            //Debug.Log("Entrée 1")
-		}
-        if(Input.GetKeyDown(KeyCode.P))
-		{
-            CallNextClip(-1);
-		}
+
     }
 
     public void CallNextClip(int _cursorMovement)
@@ -58,6 +51,7 @@ public class FlowManager : MonoBehaviour
 			{
                 _voiceToPlay = voicesToPlay[i].audioClipName;
                 CurrentVoiceClipIndex = _TargetIndex;
+                isVoiceStopped = false;
                 break;
 			}
 		}
@@ -68,5 +62,18 @@ public class FlowManager : MonoBehaviour
         SoundManager.Instance.PlayVoiceEffect(_voiceToPlay);
 	}
 
+    public void PlayPauseClip()
+	{
+        if(isVoiceStopped)
+		{
+            SoundManager.Instance.ContinueVoice();
+            isVoiceStopped = false;
+		}
+		else
+		{
+            SoundManager.Instance.StopVoice();
+            isVoiceStopped = true;
+		}
+	}
 
 }

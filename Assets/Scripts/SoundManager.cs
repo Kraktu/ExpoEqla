@@ -15,6 +15,7 @@ public class SoundManager : MonoBehaviour
 	[Header("Listof sound effect clips")]
 	Dictionary<string, AudioClip> _soundEffectsDict = new Dictionary<string, AudioClip>();
 	private string _lastPlayedVoice;
+	float currentVoiceClipTime;
 
 	[System.Serializable]
 	public struct AudioClipStruct
@@ -90,22 +91,48 @@ public class SoundManager : MonoBehaviour
 		_aSourceSFX.outputAudioMixerGroup.audioMixer.SetFloat("SFXCompleteSFXVolume", volume);
 		_aSourceSFX.PlayOneShot(_soundEffectsDict[clipName]);
 	}
+	// Original function
+	//public void PlayVoiceEffect(string clipName, float pitch = 1, float volume = 0)
+	//{
+	//	_aSourceVoice.outputAudioMixerGroup.audioMixer.SetFloat("VoicesSFXPitch", pitch);
+	//	_aSourceVoice.outputAudioMixerGroup.audioMixer.SetFloat("VoicesSFXVolume", volume);
+	//	_aSourceVoice.Stop();
+	//	_lastPlayedVoice = clipName;
+	//	_aSourceVoice.PlayOneShot(_soundEffectsDict[clipName]);
+	//}
+
 	public void PlayVoiceEffect(string clipName, float pitch = 1, float volume = 0)
 	{
 		_aSourceVoice.outputAudioMixerGroup.audioMixer.SetFloat("VoicesSFXPitch", pitch);
 		_aSourceVoice.outputAudioMixerGroup.audioMixer.SetFloat("VoicesSFXVolume", volume);
 		_aSourceVoice.Stop();
 		_lastPlayedVoice = clipName;
-		_aSourceVoice.PlayOneShot(_soundEffectsDict[clipName]);
+		_aSourceVoice.clip = _soundEffectsDict[clipName];
+		_aSourceVoice.Play();
 	}
+	//Original Function
+	//public void ReplayLastVoice()
+	//{
+	//	_aSourceVoice.Stop();
+	//	_aSourceVoice.PlayOneShot(_soundEffectsDict[_lastPlayedVoice]);
+	//}
 	public void ReplayLastVoice()
 	{
 		_aSourceVoice.Stop();
-		_aSourceVoice.PlayOneShot(_soundEffectsDict[_lastPlayedVoice]);
+		_aSourceVoice.time = 0;
+		_aSourceVoice.Play();
 	}
+	// Nouvelle function
 	public void StopVoice()
 	{
+		currentVoiceClipTime = _aSourceVoice.time;
+		Debug.Log(currentVoiceClipTime);
 		_aSourceVoice.Stop();
+	}
+	public void ContinueVoice()
+	{
+		_aSourceVoice.Play();
+		_aSourceVoice.time = currentVoiceClipTime;
 	}
 	public void StopMusic()
 	{
