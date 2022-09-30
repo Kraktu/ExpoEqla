@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class SoundManager : MonoBehaviour
 {
 	[Header("AudioSources")]
-	public AudioSource _aSourceSFX, _aSourceMusic, _aSourceMicrophone, _aSourceVoice, _aSourceAmbiant;
+	public AudioSource aSourceSFX, aSourceMusic, aSourceMicrophone, aSourceVoice, aSourceAmbiant;
 	float _originalpitch = 1f;
 	public float sfxVolume, initialMusicVolume;
 	static public SoundManager Instance { get; private set; }
@@ -15,7 +15,7 @@ public class SoundManager : MonoBehaviour
 	[Header("Listof sound effect clips")]
 	Dictionary<string, AudioClip> _soundEffectsDict = new Dictionary<string, AudioClip>();
 	private string _lastPlayedVoice;
-	float currentVoiceClipTime;
+	float _currentVoiceClipTime;
 
 	[System.Serializable]
 	public struct AudioClipStruct
@@ -77,19 +77,19 @@ public class SoundManager : MonoBehaviour
 	}
 	public void StopAmbiant()
 	{
-		_aSourceAmbiant.Stop();
+		aSourceAmbiant.Stop();
 	}
 	public void PlayAmbiantSound(string clipName, float pitch = 1, float volume = 0)
 	{
-		_aSourceAmbiant.outputAudioMixerGroup.audioMixer.SetFloat("AmbiantSFXPitch", pitch);
-		_aSourceAmbiant.outputAudioMixerGroup.audioMixer.SetFloat("AmbiantSFXVolume", volume);
-		_aSourceAmbiant.PlayOneShot(_soundEffectsDict[clipName]);
+		aSourceAmbiant.outputAudioMixerGroup.audioMixer.SetFloat("AmbiantSFXPitch", pitch);
+		aSourceAmbiant.outputAudioMixerGroup.audioMixer.SetFloat("AmbiantSFXVolume", volume);
+		aSourceAmbiant.PlayOneShot(_soundEffectsDict[clipName]);
 	}
 	public void PlaySoundEffect(string clipName, float pitch = 1, float volume = 0)
 	{
-		_aSourceSFX.outputAudioMixerGroup.audioMixer.SetFloat("SFXCompleteSFXPitch", pitch);
-		_aSourceSFX.outputAudioMixerGroup.audioMixer.SetFloat("SFXCompleteSFXVolume", volume);
-		_aSourceSFX.PlayOneShot(_soundEffectsDict[clipName]);
+		aSourceSFX.outputAudioMixerGroup.audioMixer.SetFloat("SFXCompleteSFXPitch", pitch);
+		aSourceSFX.outputAudioMixerGroup.audioMixer.SetFloat("SFXCompleteSFXVolume", volume);
+		aSourceSFX.PlayOneShot(_soundEffectsDict[clipName]);
 	}
 	// Original function
 	//public void PlayVoiceEffect(string clipName, float pitch = 1, float volume = 0)
@@ -103,12 +103,12 @@ public class SoundManager : MonoBehaviour
 
 	public void PlayVoiceEffect(string clipName, float pitch = 1, float volume = 0)
 	{
-		_aSourceVoice.outputAudioMixerGroup.audioMixer.SetFloat("VoicesSFXPitch", pitch);
-		_aSourceVoice.outputAudioMixerGroup.audioMixer.SetFloat("VoicesSFXVolume", volume);
-		_aSourceVoice.Stop();
+		aSourceVoice.outputAudioMixerGroup.audioMixer.SetFloat("VoicesSFXPitch", pitch);
+		aSourceVoice.outputAudioMixerGroup.audioMixer.SetFloat("VoicesSFXVolume", volume);
+		aSourceVoice.Stop();
 		_lastPlayedVoice = clipName;
-		_aSourceVoice.clip = _soundEffectsDict[clipName];
-		_aSourceVoice.Play();
+		aSourceVoice.clip = _soundEffectsDict[clipName];
+		aSourceVoice.Play();
 	}
 	//Original Function
 	//public void ReplayLastVoice()
@@ -118,41 +118,48 @@ public class SoundManager : MonoBehaviour
 	//}
 	public void ReplayLastVoice()
 	{
-		_aSourceVoice.Stop();
-		_aSourceVoice.time = 0;
-		_aSourceVoice.Play();
+		
+		if(aSourceVoice.clip==null){
+			PlaySoundEffect("bonk");
+		}
+		else
+		{
+			aSourceVoice.Stop();
+			aSourceVoice.time = 0;
+			aSourceVoice.Play();
+		}
 	}
 	// Nouvelle function
 	public void StopVoice()
 	{
-		currentVoiceClipTime = _aSourceVoice.time;
-		Debug.Log(currentVoiceClipTime);
-		_aSourceVoice.Stop();
+		_currentVoiceClipTime = aSourceVoice.time;
+		Debug.Log(_currentVoiceClipTime);
+		aSourceVoice.Stop();
 	}
 	public void ContinueVoice()
 	{
-		_aSourceVoice.Play();
-		_aSourceVoice.time = currentVoiceClipTime;
+		aSourceVoice.Play();
+		aSourceVoice.time = _currentVoiceClipTime;
 	}
 	public void StopMusic()
 	{
-		_aSourceMusic.Stop();
+		aSourceMusic.Stop();
 	}
 	public void ChangeMusicPitch(float pitch)
 	{
-		_aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicCompleteMusicPitch", pitch);
+		aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicCompleteMusicPitch", pitch);
 		_originalpitch = pitch;
 	}
 	public void ChangeMusic(string clipName, float pitch = 1, float volume = 0)
 	{
-		_aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicCompleteMusicPitch", pitch);
-		_aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicCompleteMusicVolume", volume);
-		_aSourceMusic.clip = _soundEffectsDict[clipName];
-		_aSourceMusic.Play();
+		aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicCompleteMusicPitch", pitch);
+		aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicCompleteMusicVolume", volume);
+		aSourceMusic.clip = _soundEffectsDict[clipName];
+		aSourceMusic.Play();
 	}
 	public void ChangeMusicVolume(float volume)
 	{
-		_aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicCompleteMusicVolume", volume);
+		aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicCompleteMusicVolume", volume);
 	}
 	public void lowerMusicPitch(float duration)
 	{
@@ -165,36 +172,28 @@ public class SoundManager : MonoBehaviour
 		while (time <= duration)
 		{
 			float tRatio = time / duration;
-			_aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicCompleteMusicPitch", Mathf.Lerp(_originalpitch, 0, tRatio));
+			aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicCompleteMusicPitch", Mathf.Lerp(_originalpitch, 0, tRatio));
 			time += Time.deltaTime;
 			yield return null;
 		}
-		_aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicCompleteMusicPitch", 0);
+		aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicCompleteMusicPitch", 0);
 	}
 	public void ReturnAtOriginalMusicPitch()
 	{
-		_aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicCompleteMusicPitch", _originalpitch);
+		aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicCompleteMusicPitch", _originalpitch);
 	}
 	public void ApplyReverbToMusic(float dryLevel = 0, float room = -10000, float roomHF = 0)
 	{
-		_aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicMasterReverbDryLevel", dryLevel);
-		_aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicMasterReverbRoom", room);
-		_aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicMasterReverbRoomHF", roomHF);
+		aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicMasterReverbDryLevel", dryLevel);
+		aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicMasterReverbRoom", room);
+		aSourceMusic.outputAudioMixerGroup.audioMixer.SetFloat("MusicMasterReverbRoomHF", roomHF);
 	}
 	public void SetVoiceVolume(float volume)
 	{
-		_aSourceVoice.volume += volume;
+		aSourceVoice.volume += volume;
 	}
 	public void SetSFXVolume(float volume)
 	{
-		_aSourceSFX.volume += volume;
-	}
-	public IEnumerator ReadLetterFromString(string stringToRead)
-	{
-		for (int i = 0; i < stringToRead.Length; i++)
-		{
-			SoundManager.Instance.PlayVoiceEffect(stringToRead[i].ToString(), 0.95f, 10);
-			yield return new WaitForSeconds(1);
-		}
+		aSourceSFX.volume += volume;
 	}
 }

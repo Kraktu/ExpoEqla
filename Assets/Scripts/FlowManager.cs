@@ -57,14 +57,21 @@ public class FlowManager : MonoBehaviour
 		}
         if(_voiceToPlay=="")
 		{
-            // Retour au menu principal
+            SoundManager.Instance.PlaySoundEffect("bonk");
 		}
-        SoundManager.Instance.PlayVoiceEffect(_voiceToPlay);
+		else
+		{
+            SoundManager.Instance.PlayVoiceEffect(_voiceToPlay);
+		}
 	}
 
     public void PlayPauseClip()
 	{
-        if(isVoiceStopped)
+		if (SoundManager.Instance.aSourceVoice.clip==null||SoundManager.Instance.aSourceVoice.time==0)
+		{
+            SoundManager.Instance.PlaySoundEffect("bonk");
+		}
+        else if(isVoiceStopped)
 		{
             SoundManager.Instance.ContinueVoice();
             isVoiceStopped = false;
