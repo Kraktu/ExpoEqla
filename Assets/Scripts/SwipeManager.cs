@@ -12,16 +12,36 @@ public enum Swipe {
 
 public class SwipeManager : MonoBehaviour
 {
+    [HideInInspector]
+    public bool isDetectingSwipe;
     public float minSwipeLength = 200f;
     Vector2 firstPressPos;
     Vector2 secondPressPos;
     Vector2 currentSwipe;
 
+    [HideInInspector]
     public static Swipe swipeDirection;
+
+    static public SwipeManager Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
 
     void Update()
     {
-        DetectSwipe();
+        if(isDetectingSwipe)
+		{
+            DetectSwipe();
+		}
     }
 
     public void DetectSwipe()
@@ -85,10 +105,10 @@ public class SwipeManager : MonoBehaviour
                 FlowManager.Instance.PlayPauseClip();
 				break;
 			case Swipe.Left:
-                FlowManager.Instance.CallNextClip(-1);
+                FlowManager.Instance.VerifyNextClip(-1);
 				break;
 			case Swipe.Right:
-                FlowManager.Instance.CallNextClip(1);
+                FlowManager.Instance.VerifyNextClip(1);
 				break;
 			default:
 				break;

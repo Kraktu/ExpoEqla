@@ -15,7 +15,8 @@ public class FlowManager : MonoBehaviour
 
     int CurrentVoiceClipIndex = 0;
     bool isVoiceStopped;
-
+    public float maxDelayBetweenActions=1;
+    Coroutine securityCoroutine, ControlVoiceCoroutine;
     static public FlowManager Instance { get; private set; }
 
     void Awake()
@@ -41,6 +42,24 @@ public class FlowManager : MonoBehaviour
 
     }
 
+    public void VerifyNextClip(int _cursorMovement)
+	{
+        StopCoroutine(securityCoroutine);
+        if (SoundManager.Instance.aSourceVoice.clip.name=="transition"|| SoundManager.Instance.aSourceVoice.clip==null)
+	    {
+            CallNextClip(_cursorMovement);
+            securityCoroutine= StartCoroutine(SwipeSecuring(false));
+
+        }
+        else
+		{
+            SoundManager.Instance.PlayVoiceEffect("transition");
+            securityCoroutine = StartCoroutine(SwipeSecuring(true));
+
+        }
+		    
+	}
+
     public void CallNextClip(int _cursorMovement)
 	{
         int _TargetIndex = CurrentVoiceClipIndex + _cursorMovement;
@@ -63,6 +82,30 @@ public class FlowManager : MonoBehaviour
 		{
             SoundManager.Instance.PlayVoiceEffect(_voiceToPlay);
 		}
+	}
+
+    IEnumerator SwipeSecuring(bool _isTransition)
+	{
+        float _time = 0;
+        SwipeManager.Instance.isDetectingSwipe = false;
+		while (_time<maxDelayBetweenActions)
+		{
+            _time += Time.deltaTime;
+            yield return null;
+		}
+        SwipeManager.Instance.isDetectingSwipe = true;
+		if (!_isTransition)
+		{
+            ControlVoiceCoroutine= StartCoroutine(ControlingCurrentVoice());
+		}
+	}
+    IEnumerator ControlingCurrentVoice()
+	{
+		while (SoundManager.Instance.aSourceVoice.time!=0)
+		{
+            yield return null;
+		}
+        VerifyNextClip(1);
 	}
 
     public void PlayPauseClip()
