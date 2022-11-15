@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum Swipe { 
     None, 
@@ -13,12 +14,22 @@ public enum Swipe {
 public class SwipeManager : MonoBehaviour
 {
     [HideInInspector]
-    public bool isDetectingSwipe;
+    public bool isDetectingControls;
     public float minSwipeLength = 200f;
     Vector2 firstPressPos;
     Vector2 secondPressPos;
     Vector2 currentSwipe;
 
+    // Double tap, et sécurité
+    public float doubleTapDetectTimer=0.2f, resetDetectTimer=5f;
+    public int nbrOfActionToReset=5;
+
+    int consecutiveTapNbr = 0;
+    int unlockingActionNbr=0;
+
+    Coroutine resetTimerCoroutine,doubleTapDetectionCoroutine;
+
+    //-----------------------------
     [HideInInspector]
     public static Swipe swipeDirection;
 
@@ -33,12 +44,12 @@ public class SwipeManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
     }
 
     void Update()
     {
-        if(isDetectingSwipe)
+        if(isDetectingControls)
 		{
             DetectSwipe();
 		}
@@ -61,6 +72,7 @@ public class SwipeManager : MonoBehaviour
             if (currentSwipe.magnitude < minSwipeLength)
             {
                 swipeDirection = Swipe.None;
+                DoAction();
                 return;
             }
 
@@ -83,7 +95,6 @@ public class SwipeManager : MonoBehaviour
                 swipeDirection = Swipe.Right;
             //Debug.Log("swipe right"+currentSwipe.y);
             }
-
             DoAction();
         }
         else
@@ -97,21 +108,76 @@ public class SwipeManager : MonoBehaviour
 		switch (swipeDirection)
 		{
 			case Swipe.None:
+                CancelReset();
+                consecutiveTapNbr++;
+                doubleTapDetectionCoroutine= StartCoroutine(CheckingForDoubleTapTiming());
+                if(consecutiveTapNbr==2)
+				{
+                    FlowManager.Instance.PlayPauseClip();
+                    consecutiveTapNbr = 0;
+					StopCoroutine(doubleTapDetectionCoroutine);
+				}
 				break;
 			case Swipe.Up:
+                consecutiveTapNbr = 0;
+                CancelReset();
                 SoundManager.Instance.ReplayLastVoice();
 				break;
 			case Swipe.Down:
-                FlowManager.Instance.PlayPauseClip();
+                consecutiveTapNbr = 0;
+                if (unlockingActionNbr==0)
+				{
+                    resetTimerCoroutine= StartCoroutine(CheckingForResetTiming());
+				}
+                unlockingActionNbr++;
+                if(unlockingActionNbr == nbrOfActionToReset)
+				{
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+				}
 				break;
 			case Swipe.Left:
+                consecutiveTapNbr = 0;
+                CancelReset();
                 FlowManager.Instance.VerifyNextClip(-1);
 				break;
 			case Swipe.Right:
+                consecutiveTapNbr = 0;
+                CancelReset();
                 FlowManager.Instance.VerifyNextClip(1);
 				break;
 			default:
 				break;
 		}
 	}
+
+    public IEnumerator CheckingForResetTiming()
+	{
+        float time = 0;
+		while (time<=resetDetectTimer)
+		{
+            time += Time.deltaTime;
+            yield return null;
+		}
+        unlockingActionNbr = 0;
+	}
+
+    void CancelReset()
+	{
+        unlockingActionNbr = 0;
+        if(resetTimerCoroutine!=null)
+		{
+            StopCoroutine(resetTimerCoroutine);
+		}
+    }
+
+    public IEnumerator CheckingForDoubleTapTiming()
+    {
+        float time = 0;
+        while (time <= doubleTapDetectTimer)
+        {
+            time += Time.deltaTime;
+            yield return null;
+        }
+        consecutiveTapNbr = 0;
+    }
 }

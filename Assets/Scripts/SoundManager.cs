@@ -36,7 +36,7 @@ public class SoundManager : MonoBehaviour
 		}
 
 		Instance = this;
-		DontDestroyOnLoad(gameObject);
+		//DontDestroyOnLoad(gameObject);
 		GenerateSoundEffectDict();
 
 	}
@@ -108,6 +108,7 @@ public class SoundManager : MonoBehaviour
 		aSourceVoice.Stop();
 		_lastPlayedVoice = clipName;
 		aSourceVoice.clip = _soundEffectsDict[clipName];
+		aSourceVoice.time = 0;
 		aSourceVoice.Play();
 	}
 	//Original Function

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [System.Serializable]
 public struct OrderedAudioClips
@@ -17,6 +18,9 @@ public class FlowManager : MonoBehaviour
     bool isVoiceStopped;
     public float maxDelayBetweenActions=1;
     Coroutine securityCoroutine, ControlVoiceCoroutine;
+    public Sprite introImage, expoImage, outroImage;
+    public Image background;
+    public Button buttonToWebsite;
     static public FlowManager Instance { get; private set; }
 
     void Awake()
@@ -28,12 +32,13 @@ public class FlowManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
     }
     // Start is called before the first frame update
     void Start()
     {
-        
+        securityCoroutine=StartCoroutine(SwipeSecuring(true));
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
 
     // Update is called once per frame
@@ -45,18 +50,18 @@ public class FlowManager : MonoBehaviour
     public void VerifyNextClip(int _cursorMovement)
 	{
         StopCoroutine(securityCoroutine);
-        if (SoundManager.Instance.aSourceVoice.clip.name=="transition"|| SoundManager.Instance.aSourceVoice.clip==null)
-	    {
+     //   if (SoundManager.Instance.aSourceVoice.clip.name=="transition"|| SoundManager.Instance.aSourceVoice.clip==null)
+	    //{
             CallNextClip(_cursorMovement);
             securityCoroutine= StartCoroutine(SwipeSecuring(false));
 
-        }
-        else
-		{
-            SoundManager.Instance.PlayVoiceEffect("transition");
-            securityCoroutine = StartCoroutine(SwipeSecuring(true));
+     //   }
+  //      else
+		//{
+  //          SoundManager.Instance.PlayVoiceEffect("transition");
+  //          securityCoroutine = StartCoroutine(SwipeSecuring(true));
 
-        }
+  //      }
 		    
 	}
 
@@ -82,22 +87,43 @@ public class FlowManager : MonoBehaviour
 		{
             SoundManager.Instance.PlayVoiceEffect(_voiceToPlay);
 		}
+        CheckForImage();
+	}
+    public void CheckForImage()
+	{
+        if(CurrentVoiceClipIndex==(voicesToPlay.Count))
+		{
+            background.sprite = outroImage;
+            buttonToWebsite.gameObject.SetActive(true);
+
+		}
+        else if(CurrentVoiceClipIndex == 0)
+		{
+            background.sprite = introImage;
+            buttonToWebsite.gameObject.SetActive(false);
+        }
+		else
+		{
+            background.sprite = expoImage;
+            buttonToWebsite.gameObject.SetActive(false);
+        }
+
 	}
 
     IEnumerator SwipeSecuring(bool _isTransition)
 	{
         float _time = 0;
-        SwipeManager.Instance.isDetectingSwipe = false;
+        SwipeManager.Instance.isDetectingControls = false;
 		while (_time<maxDelayBetweenActions)
 		{
             _time += Time.deltaTime;
             yield return null;
 		}
-        SwipeManager.Instance.isDetectingSwipe = true;
-		if (!_isTransition)
-		{
-            ControlVoiceCoroutine= StartCoroutine(ControlingCurrentVoice());
-		}
+        SwipeManager.Instance.isDetectingControls = true;
+		//if (!_isTransition)
+		//{
+  //          ControlVoiceCoroutine= StartCoroutine(ControlingCurrentVoice());
+		//}
 	}
     IEnumerator ControlingCurrentVoice()
 	{
@@ -110,7 +136,7 @@ public class FlowManager : MonoBehaviour
 
     public void PlayPauseClip()
 	{
-		if (SoundManager.Instance.aSourceVoice.clip==null||SoundManager.Instance.aSourceVoice.time==0)
+		if (SoundManager.Instance.aSourceVoice.clip==null||(SoundManager.Instance.aSourceVoice.time==0&&isVoiceStopped==false))
 		{
             SoundManager.Instance.PlaySoundEffect("bonk");
 		}
@@ -124,6 +150,11 @@ public class FlowManager : MonoBehaviour
             SoundManager.Instance.StopVoice();
             isVoiceStopped = true;
 		}
+	}
+
+    public void GoToWebsite(string _url)
+	{
+        Application.OpenURL(_url);
 	}
 
 }
