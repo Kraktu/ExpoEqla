@@ -20,7 +20,7 @@ public class FlowManager : MonoBehaviour
     Coroutine securityCoroutine, ControlVoiceCoroutine;
     public Sprite introImage, expoImage, outroImage;
     public Image background;
-    public Button buttonToWebsite;
+    public Button buttonToWebsite, quitStartingScreenButton,quitEndingScreenButton;
     static public FlowManager Instance { get; private set; }
 
     void Awake()
@@ -95,17 +95,23 @@ public class FlowManager : MonoBehaviour
 		{
             background.sprite = outroImage;
             buttonToWebsite.gameObject.SetActive(true);
+            quitStartingScreenButton.gameObject.SetActive(false);
+            quitEndingScreenButton.gameObject.SetActive(true);
 
-		}
+        }
         else if(CurrentVoiceClipIndex == 0)
 		{
             background.sprite = introImage;
             buttonToWebsite.gameObject.SetActive(false);
+            quitStartingScreenButton.gameObject.SetActive(true);
+            quitEndingScreenButton.gameObject.SetActive(false);
         }
 		else
 		{
             background.sprite = expoImage;
             buttonToWebsite.gameObject.SetActive(false);
+            quitStartingScreenButton.gameObject.SetActive(false);
+            quitEndingScreenButton.gameObject.SetActive(false);
         }
 
 	}
@@ -156,5 +162,8 @@ public class FlowManager : MonoBehaviour
 	{
         Application.OpenURL(_url);
 	}
-
+    public void QuitAppli()
+	{
+        Application.Quit();
+	}
 }
