@@ -18,9 +18,7 @@ public class FlowManager : MonoBehaviour
     bool isVoiceStopped;
     public float maxDelayBetweenActions=1;
     Coroutine securityCoroutine, ControlVoiceCoroutine;
-    public Sprite introImage, expoImage, outroImage;
-    public Image background;
-    public Button buttonToWebsite, quitStartingScreenButton,quitEndingScreenButton;
+    public GameObject firstScreen, secondScreen, thirdScreen;
     static public FlowManager Instance { get; private set; }
 
     void Awake()
@@ -93,25 +91,22 @@ public class FlowManager : MonoBehaviour
 	{
         if(CurrentVoiceClipIndex==(voicesToPlay.Count))
 		{
-            background.sprite = outroImage;
-            buttonToWebsite.gameObject.SetActive(true);
-            quitStartingScreenButton.gameObject.SetActive(false);
-            quitEndingScreenButton.gameObject.SetActive(true);
+            thirdScreen.gameObject.SetActive(true);
+            firstScreen.gameObject.SetActive(false);
+            secondScreen.gameObject.SetActive(false);
 
         }
         else if(CurrentVoiceClipIndex == 0)
 		{
-            background.sprite = introImage;
-            buttonToWebsite.gameObject.SetActive(false);
-            quitStartingScreenButton.gameObject.SetActive(true);
-            quitEndingScreenButton.gameObject.SetActive(false);
+            thirdScreen.gameObject.SetActive(false);
+            firstScreen.gameObject.SetActive(true);
+            secondScreen.gameObject.SetActive(false);
         }
 		else
 		{
-            background.sprite = expoImage;
-            buttonToWebsite.gameObject.SetActive(false);
-            quitStartingScreenButton.gameObject.SetActive(false);
-            quitEndingScreenButton.gameObject.SetActive(false);
+            thirdScreen.gameObject.SetActive(false);
+            firstScreen.gameObject.SetActive(false);
+            secondScreen.gameObject.SetActive(true);
         }
 
 	}
