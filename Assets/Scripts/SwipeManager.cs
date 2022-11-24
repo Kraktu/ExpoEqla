@@ -115,7 +115,10 @@ public class SwipeManager : MonoBehaviour
 				{
                     FlowManager.Instance.PlayPauseClip();
                     consecutiveTapNbr = 0;
-					StopCoroutine(doubleTapDetectionCoroutine);
+                    if(doubleTapDetectionCoroutine!=null)
+					{
+                        StopCoroutine(doubleTapDetectionCoroutine);
+					}
 				}
 				break;
 			case Swipe.Up:
@@ -138,12 +141,12 @@ public class SwipeManager : MonoBehaviour
 			case Swipe.Left:
                 consecutiveTapNbr = 0;
                 CancelReset();
-                FlowManager.Instance.VerifyNextClip(-1);
+                FlowManager.Instance.VerifyNextClip(-1, true);
 				break;
 			case Swipe.Right:
                 consecutiveTapNbr = 0;
                 CancelReset();
-                FlowManager.Instance.VerifyNextClip(1);
+                FlowManager.Instance.VerifyNextClip(1,true);
 				break;
 			default:
 				break;

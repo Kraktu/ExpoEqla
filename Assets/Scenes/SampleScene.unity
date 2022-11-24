@@ -1829,6 +1829,8 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 637244eb019b43b49ae3b88d2081dfbd, type: 3}
   - name: bonk
     clip: {fileID: 8300000, guid: ef116dd16a1d8054aada9fbcf82fd6fc, type: 3}
+  - name: transition
+    clip: {fileID: 8300000, guid: 0bd7daec3b70e0c48b35bf118022c9bc, type: 3}
 --- !u!4 &1432755939
 Transform:
   m_ObjectHideFlags: 0

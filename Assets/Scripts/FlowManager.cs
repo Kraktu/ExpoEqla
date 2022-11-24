@@ -45,21 +45,29 @@ public class FlowManager : MonoBehaviour
 
     }
 
-    public void VerifyNextClip(int _cursorMovement)
+    public void VerifyNextClip(int _cursorMovement, bool _isSwipe)
 	{
-        StopCoroutine(securityCoroutine);
-     //   if (SoundManager.Instance.aSourceVoice.clip.name=="transition"|| SoundManager.Instance.aSourceVoice.clip==null)
-	    //{
+        if(securityCoroutine!=null)
+		{
+            StopCoroutine(securityCoroutine);
+        }
+        
+        if(ControlVoiceCoroutine!=null)
+		{
+            StopCoroutine(ControlVoiceCoroutine);
+		}
+        if (_isSwipe || SoundManager.Instance.aSourceVoice.clip.name=="transition"|| SoundManager.Instance.aSourceVoice.clip==null)
+	    {
             CallNextClip(_cursorMovement);
             securityCoroutine= StartCoroutine(SwipeSecuring(false));
 
-     //   }
-  //      else
-		//{
-  //          SoundManager.Instance.PlayVoiceEffect("transition");
-  //          securityCoroutine = StartCoroutine(SwipeSecuring(true));
+        }
+        else
+		{
+            SoundManager.Instance.PlayVoiceEffect("transition");
+            securityCoroutine = StartCoroutine(SwipeSecuring(true));
 
-  //      }
+        }
 		    
 	}
 
@@ -121,10 +129,10 @@ public class FlowManager : MonoBehaviour
             yield return null;
 		}
         SwipeManager.Instance.isDetectingControls = true;
-		//if (!_isTransition)
-		//{
-  //          ControlVoiceCoroutine= StartCoroutine(ControlingCurrentVoice());
-		//}
+		if (!_isTransition)
+		{
+            ControlVoiceCoroutine= StartCoroutine(ControlingCurrentVoice());
+		}
 	}
     IEnumerator ControlingCurrentVoice()
 	{
@@ -132,7 +140,7 @@ public class FlowManager : MonoBehaviour
 		{
             yield return null;
 		}
-        VerifyNextClip(1);
+        VerifyNextClip(1,false);
 	}
 
     public void PlayPauseClip()
