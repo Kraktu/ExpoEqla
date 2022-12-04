@@ -145,13 +145,23 @@ public class FlowManager : MonoBehaviour
 
     public void PlayPauseClip()
 	{
-		if (SoundManager.Instance.aSourceVoice.clip==null||(SoundManager.Instance.aSourceVoice.time==0&&isVoiceStopped==false))
+        if (securityCoroutine != null)
+        {
+            StopCoroutine(securityCoroutine);
+        }
+
+        if (ControlVoiceCoroutine != null)
+        {
+            StopCoroutine(ControlVoiceCoroutine);
+        }
+        if (SoundManager.Instance.aSourceVoice.clip==null||(SoundManager.Instance.aSourceVoice.time==0&&isVoiceStopped==false))
 		{
             SoundManager.Instance.PlaySoundEffect("bonk");
 		}
         else if(isVoiceStopped)
 		{
             SoundManager.Instance.ContinueVoice();
+            securityCoroutine = StartCoroutine(SwipeSecuring(false));
             isVoiceStopped = false;
 		}
 		else
